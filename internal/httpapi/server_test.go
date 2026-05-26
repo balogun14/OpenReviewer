@@ -77,6 +77,55 @@ func TestGitHubWebhookReviewsPullRequestAndPublishesSummary(t *testing.T) {
 	}
 }
 
+func TestRootAcceptsGitHubWebhookForMisconfiguredWebhookURL(t *testing.T) {
+	gh := &fakeGitHubClient{
+		files: []github.PullRequestFile{
+			{
+				Filename: "main.go",
+				Status:   "modified",
+				Patch:    "@@ -1 +1 @@\n+const password = \"secret\"",
+			},
+		},
+		metadata: github.PullRequestMetadata{
+			HeadSHA: "head-sha",
+			Title:   "Add secret",
+		},
+	}
+
+	renderer := prompt.NewRenderer(prompt.NewLoader("../../prompts"), prompt.DefaultManifest())
+	engine := review.NewEngine(provider.NewMockProvider(), renderer, review.DefaultReviewerPersonas())
+	server := NewServer(ServerOptions{
+		ReviewEngine: engine,
+		GitHubClient: gh,
+	})
+
+	req := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader(pullRequestPayload(t, "opened")))
+	req.Header.Set("X-GitHub-Event", "pull_request")
+	req.Header.Set("X-GitHub-Delivery", "delivery-root")
+	rec := httptest.NewRecorder()
+
+	server.Routes().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusAccepted {
+		t.Fatalf("unexpected status: %d body=%s", rec.Code, rec.Body.String())
+	}
+	if gh.summaryComments != 1 {
+		t.Fatalf("expected summary comment from root webhook, got %d", gh.summaryComments)
+	}
+}
+
+func TestRootReturnsServiceInfo(t *testing.T) {
+	server := NewServer(ServerOptions{})
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+
+	server.Routes().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("unexpected status: %d", rec.Code)
+	}
+}
+
 func pullRequestPayload(t *testing.T, action string) []byte {
 	t.Helper()
 
