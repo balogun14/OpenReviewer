@@ -31,10 +31,13 @@ type Finding struct {
 	ID             string   `json:"id"`
 	Severity       Severity `json:"severity"`
 	Category       Category `json:"category"`
+	Subcategory    string   `json:"subcategory,omitempty"`
 	Title          string   `json:"title"`
 	Description    string   `json:"description"`
+	Impact         string   `json:"impact,omitempty"`
 	Recommendation string   `json:"recommendation"`
 	Location       Location `json:"location,omitempty"`
+	Confidence     string   `json:"confidence,omitempty"`
 	Persona        string   `json:"persona,omitempty"`
 }
 
