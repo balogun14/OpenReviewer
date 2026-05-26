@@ -128,6 +128,8 @@ Set the GitHub App webhook URL to:
 https://YOUR_NGROK_DOMAIN/webhooks/github
 ```
 
+If GitHub posts to `/` instead, ngrok will show `POST /`. OpenReview AI accepts this as a fallback, but the canonical webhook URL is still `/webhooks/github`.
+
 Then open or update a pull request in an installed repository.
 
 Expected behavior:
