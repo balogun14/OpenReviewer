@@ -57,6 +57,8 @@ Requirements:
 - Go 1.25+
 - Docker, optional
 
+To run OpenReview AI as a real GitHub App, see [docs/github-app.md](docs/github-app.md).
+
 Run locally:
 
 ```powershell
@@ -157,6 +159,8 @@ For the step-by-step build plan and implementation checklist, see [IMPLEMENTATIO
 ## Contributing
 
 Contributions are welcome. Start with [CONTRIBUTING.md](CONTRIBUTING.md), then check open issues or propose a focused change.
+
+Contributor workflows for GitHub App testing, provider testing, and per-file commits are documented in [docs/contributor-workflows.md](docs/contributor-workflows.md).
 
 Useful commands:
 
