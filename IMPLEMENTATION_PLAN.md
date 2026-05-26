@@ -30,18 +30,18 @@ Goal: replace mock review behavior with real provider-backed structured reviews.
 - [x] Add response validation
 - [x] Normalize LLM findings into internal findings
 - [x] Handle malformed model responses
-- [ ] Add provider retry policy
-- [ ] Add OpenRouter provider
-- [ ] Add OpenAI-compatible provider
-- [ ] Add provider configuration from environment
+- [x] Add provider retry policy
+- [x] Add OpenRouter provider
+- [x] Add OpenAI-compatible provider
+- [x] Add provider configuration from environment
 - [x] Add tests for response parsing and validation
-- [ ] Add tests for provider request construction
+- [x] Add tests for provider request construction
 
 Exit criteria:
 
-- [ ] A local request can run selected prompts against a real LLM provider
-- [ ] Provider responses become normalized findings
-- [ ] Invalid provider responses fail safely
+- [x] A local request can run selected prompts against a real LLM provider
+- [x] Provider responses become normalized findings
+- [x] Invalid provider responses fail safely
 
 ## Phase 2: GitHub PR Integration
 
