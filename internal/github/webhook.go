@@ -27,6 +27,9 @@ type PullRequestEvent struct {
 		} `json:"owner"`
 		FullName string `json:"full_name"`
 	} `json:"repository"`
+	Installation struct {
+		ID int64 `json:"id"`
+	} `json:"installation"`
 }
 
 func DecodePullRequestEvent(body []byte) (PullRequestEvent, error) {
