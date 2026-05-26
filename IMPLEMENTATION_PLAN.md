@@ -146,9 +146,9 @@ Exit criteria:
 
 Goal: turn the imported prompt folder into a maintainable OpenReview-native prompt system.
 
+- [x] Create initial `prompts/curated` OpenReview-native prompt set
 - [ ] Split raw imported prompts from curated OpenReview prompts
 - [ ] Move raw imported prompts to `prompts/vendor`
-- [ ] Move active prompts to `prompts/curated`
 - [ ] Add prompt metadata files
 - [ ] Add prompt ownership/category metadata
 - [ ] Add prompt safety classification
