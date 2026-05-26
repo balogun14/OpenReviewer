@@ -31,6 +31,10 @@ Run the service:
 go run ./cmd/openreview
 ```
 
+For GitHub App setup and local webhook testing, see [docs/github-app.md](docs/github-app.md).
+
+For common contributor workflows, see [docs/contributor-workflows.md](docs/contributor-workflows.md).
+
 ## Contribution Workflow
 
 1. Open or comment on an issue for anything non-trivial.
