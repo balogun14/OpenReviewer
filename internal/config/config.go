@@ -7,6 +7,7 @@ import (
 
 type Config struct {
 	Addr                string
+	DotEnv              DotEnvStatus
 	GitHubWebhookSecret string
 	GitHub              GitHubConfig
 	Provider            ProviderConfig
@@ -14,9 +15,12 @@ type Config struct {
 }
 
 type GitHubConfig struct {
-	AppID         string
-	PrivateKeyPEM []byte
-	APIBaseURL    string
+	AppID            string
+	PrivateKeyPEM    []byte
+	PrivateKeySource string
+	PrivateKeyPath   string
+	PrivateKeyExists bool
+	APIBaseURL       string
 }
 
 type ProviderConfig struct {
@@ -33,7 +37,7 @@ type RetryConfig struct {
 }
 
 func FromEnv() Config {
-	loadDotEnv(".env")
+	dotEnv := loadDotEnv(".env")
 
 	addr := os.Getenv("OPENREVIEW_ADDR")
 	if addr == "" {
@@ -46,13 +50,19 @@ func FromEnv() Config {
 		model = "anthropic/claude-sonnet-4"
 	}
 
+	privateKey := githubPrivateKey()
+
 	return Config{
 		Addr:                addr,
+		DotEnv:              dotEnv,
 		GitHubWebhookSecret: os.Getenv("GITHUB_WEBHOOK_SECRET"),
 		GitHub: GitHubConfig{
-			AppID:         os.Getenv("GITHUB_APP_ID"),
-			PrivateKeyPEM: githubPrivateKey(),
-			APIBaseURL:    getenvDefault("GITHUB_API_BASE_URL", "https://api.github.com"),
+			AppID:            os.Getenv("GITHUB_APP_ID"),
+			PrivateKeyPEM:    privateKey.Content,
+			PrivateKeySource: privateKey.Source,
+			PrivateKeyPath:   privateKey.Path,
+			PrivateKeyExists: privateKey.Exists,
+			APIBaseURL:       getenvDefault("GITHUB_API_BASE_URL", "https://api.github.com"),
 		},
 		Provider: ProviderConfig{
 			Type:     providerType,
@@ -68,30 +78,65 @@ func FromEnv() Config {
 	}
 }
 
-func githubPrivateKey() []byte {
+type privateKeyResult struct {
+	Content []byte
+	Source  string
+	Path    string
+	Exists  bool
+}
+
+func githubPrivateKey() privateKeyResult {
 	path := os.Getenv("GITHUB_APP_PRIVATE_KEY_PATH")
 	if path != "" {
 		content, err := os.ReadFile(path)
 		if err == nil {
-			return content
+			return privateKeyResult{Content: content, Source: "GITHUB_APP_PRIVATE_KEY_PATH", Path: path, Exists: true}
 		}
+		return privateKeyResult{Source: "GITHUB_APP_PRIVATE_KEY_PATH", Path: path, Exists: false}
 	}
 
 	value := os.Getenv("GITHUB_APP_PRIVATE_KEY")
 	if value == "" {
-		return nil
+		return privateKeyResult{}
 	}
 
 	normalized := strings.ReplaceAll(value, `\n`, "\n")
 	if strings.Contains(normalized, "BEGIN") {
-		return []byte(normalized)
+		return privateKeyResult{Content: []byte(normalized), Source: "GITHUB_APP_PRIVATE_KEY", Exists: true}
 	}
 
 	if content, err := os.ReadFile(normalized); err == nil {
-		return content
+		return privateKeyResult{Content: content, Source: "GITHUB_APP_PRIVATE_KEY", Path: normalized, Exists: true}
 	}
 
-	return []byte(normalized)
+	return privateKeyResult{Content: []byte(normalized), Source: "GITHUB_APP_PRIVATE_KEY", Path: normalized, Exists: false}
+}
+
+func (c Config) Diagnostics() map[string]any {
+	return map[string]any{
+		"dotenv_path":                    c.DotEnv.Path,
+		"dotenv_loaded":                  c.DotEnv.Loaded,
+		"addr":                           c.Addr,
+		"github_webhook_secret_set":      c.GitHubWebhookSecret != "",
+		"github_app_id_set":              c.GitHub.AppID != "",
+		"github_private_key_source":      emptyAsUnset(c.GitHub.PrivateKeySource),
+		"github_private_key_path":        emptyAsUnset(c.GitHub.PrivateKeyPath),
+		"github_private_key_file_exists": c.GitHub.PrivateKeyExists,
+		"github_private_key_loaded":      len(c.GitHub.PrivateKeyPEM) > 0,
+		"github_api_base_url":            c.GitHub.APIBaseURL,
+		"provider_type":                  c.Provider.Type,
+		"provider_model":                 emptyAsUnset(c.Provider.Model),
+		"provider_base_url":              emptyAsUnset(c.Provider.BaseURL),
+		"provider_api_key_set":           c.Provider.APIKey != "",
+		"provider_max_attempts":          c.Retry.MaxAttempts,
+	}
+}
+
+func emptyAsUnset(value string) string {
+	if value == "" {
+		return "unset"
+	}
+	return value
 }
 
 func providerAPIKey(providerType string) string {
