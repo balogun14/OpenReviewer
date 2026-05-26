@@ -17,6 +17,7 @@ import (
 func main() {
 	cfg := config.FromEnv()
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
+	logger.Info("configuration loaded", "diagnostics", cfg.Diagnostics())
 
 	promptRenderer := prompt.NewRenderer(prompt.NewLoader("prompts"), prompt.DefaultManifest())
 	reviewProvider := buildProvider(cfg, logger)
