@@ -25,16 +25,16 @@ The guiding principle is to make the core review loop real before building dashb
 
 Goal: replace mock review behavior with real provider-backed structured reviews.
 
-- [ ] Define structured LLM response schema
-- [ ] Add JSON response parser
-- [ ] Add response validation
-- [ ] Normalize LLM findings into internal findings
-- [ ] Handle malformed model responses
+- [x] Define structured LLM response schema
+- [x] Add JSON response parser
+- [x] Add response validation
+- [x] Normalize LLM findings into internal findings
+- [x] Handle malformed model responses
 - [ ] Add provider retry policy
 - [ ] Add OpenRouter provider
 - [ ] Add OpenAI-compatible provider
 - [ ] Add provider configuration from environment
-- [ ] Add tests for response parsing and validation
+- [x] Add tests for response parsing and validation
 - [ ] Add tests for provider request construction
 
 Exit criteria:
