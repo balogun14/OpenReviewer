@@ -6,12 +6,20 @@ import (
 	"strings"
 )
 
-func loadDotEnv(path string) {
+type DotEnvStatus struct {
+	Path   string
+	Loaded bool
+}
+
+func loadDotEnv(path string) DotEnvStatus {
+	status := DotEnvStatus{Path: path}
+
 	file, err := os.Open(path)
 	if err != nil {
-		return
+		return status
 	}
 	defer file.Close()
+	status.Loaded = true
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
@@ -34,4 +42,6 @@ func loadDotEnv(path string) {
 
 		_ = os.Setenv(key, value)
 	}
+
+	return status
 }
