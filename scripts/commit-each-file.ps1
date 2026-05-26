@@ -11,6 +11,9 @@ $ErrorActionPreference = "Stop"
 
 function Get-ChangedFiles {
     git ls-files --modified --others --exclude-standard
+    if ($LASTEXITCODE -ne 0) {
+        throw "git ls-files failed with exit code $LASTEXITCODE"
+    }
 }
 
 function Get-CommitSubject([string]$Path) {
@@ -18,7 +21,8 @@ function Get-CommitSubject([string]$Path) {
     return "$Prefix $normalized"
 }
 
-if (-not (git rev-parse --is-inside-work-tree 2>$null)) {
+git rev-parse --is-inside-work-tree 2>$null | Out-Null
+if ($LASTEXITCODE -ne 0) {
     throw "This script must be run inside a git repository."
 }
 
@@ -45,12 +49,21 @@ foreach ($file in $Files) {
     }
 
     git add -- "$file"
+    if ($LASTEXITCODE -ne 0) {
+        throw "git add failed for $file with exit code $LASTEXITCODE"
+    }
 
     $staged = git diff --cached --name-only -- "$file"
+    if ($LASTEXITCODE -ne 0) {
+        throw "git diff --cached failed for $file with exit code $LASTEXITCODE"
+    }
     if ([string]::IsNullOrWhiteSpace($staged)) {
         Write-Host "Skipping unchanged file: $file"
         continue
     }
 
     git commit -m "$subject" -- "$file"
+    if ($LASTEXITCODE -ne 0) {
+        throw "git commit failed for $file with exit code $LASTEXITCODE"
+    }
 }
