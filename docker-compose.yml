@@ -1,0 +1,8 @@
+services:
+  openreview:
+    build: .
+    environment:
+      OPENREVIEW_ADDR: ":8080"
+      GITHUB_WEBHOOK_SECRET: "${GITHUB_WEBHOOK_SECRET:-dev-secret}"
+    ports:
+      - "8080:8080"
