@@ -2,6 +2,8 @@
 
 OpenReview AI treats `prompts/` as a prompt library. Prompts are selected by review profile and reviewer persona, then rendered into defensive pull request review instructions before being sent to an LLM provider.
 
+The repository includes a small OpenReview-native curated prompt set under `prompts/curated`. Larger imported prompt collections should live under `prompts/vendor` until they are adapted and promoted into the curated set.
+
 ## Current Flow
 
 ```text
