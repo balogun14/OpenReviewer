@@ -1,0 +1,36 @@
+name: Prompt change
+description: Propose a new or changed review prompt
+title: "prompt: "
+labels:
+  - prompts
+body:
+  - type: textarea
+    id: purpose
+    attributes:
+      label: Purpose
+      description: What review behavior should this prompt improve?
+    validations:
+      required: true
+  - type: textarea
+    id: prompt_ids
+    attributes:
+      label: Prompt IDs or files
+      description: Which prompts are affected?
+    validations:
+      required: true
+  - type: textarea
+    id: expected_output
+    attributes:
+      label: Expected output
+      description: What findings should this produce or avoid?
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety
+      options:
+        - label: This is defensive review guidance only.
+          required: true
+        - label: This does not ask the model to perform live exploitation.
+          required: true
+        - label: This does not ask the model to extract credentials or secrets.
+          required: true
