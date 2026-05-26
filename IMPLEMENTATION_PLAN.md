@@ -61,6 +61,8 @@ Goal: review actual pull requests and publish useful GitHub feedback.
 - [x] Add idempotency for repeated webhook delivery
 - [x] Add tests for GitHub payload handling
 - [x] Add tests for changed-line mapping
+- [x] Add GitHub App setup documentation
+- [x] Add contributor workflow documentation
 
 Exit criteria:
 
