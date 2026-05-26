@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/openreview-ai/openreview/internal/config"
+	"github.com/openreview-ai/openreview/internal/github"
 	"github.com/openreview-ai/openreview/internal/httpapi"
 	"github.com/openreview-ai/openreview/internal/prompt"
 	"github.com/openreview-ai/openreview/internal/provider"
@@ -20,10 +21,12 @@ func main() {
 	promptRenderer := prompt.NewRenderer(prompt.NewLoader("prompts"), prompt.DefaultManifest())
 	reviewProvider := buildProvider(cfg, logger)
 	engine := review.NewEngine(reviewProvider, promptRenderer, review.DefaultReviewerPersonas())
+	gitHubClient := buildGitHubClient(cfg)
 	server := httpapi.NewServer(httpapi.ServerOptions{
 		Logger:              logger,
 		ReviewEngine:        engine,
 		GitHubWebhookSecret: cfg.GitHubWebhookSecret,
+		GitHubClient:        gitHubClient,
 	})
 
 	logger.Info("starting OpenReview AI", "addr", cfg.Addr)
@@ -31,6 +34,18 @@ func main() {
 		logger.Error("server stopped", "error", err)
 		os.Exit(1)
 	}
+}
+
+func buildGitHubClient(cfg config.Config) *github.Client {
+	if cfg.GitHub.AppID == "" || len(cfg.GitHub.PrivateKeyPEM) == 0 {
+		return nil
+	}
+
+	return github.NewClient(github.ClientConfig{
+		BaseURL:       cfg.GitHub.APIBaseURL,
+		AppID:         cfg.GitHub.AppID,
+		PrivateKeyPEM: cfg.GitHub.PrivateKeyPEM,
+	})
 }
 
 func buildProvider(cfg config.Config, logger *slog.Logger) provider.Reviewer {
