@@ -80,6 +80,15 @@ $env:OPENREVIEW_MODEL="anthropic/claude-sonnet-4"
 go run ./cmd/openreview
 ```
 
+Configure GitHub App credentials:
+
+```powershell
+$env:GITHUB_APP_ID="123456"
+$env:GITHUB_APP_PRIVATE_KEY_PATH="C:\path\to\private-key.pem"
+$env:GITHUB_WEBHOOK_SECRET="..."
+go run ./cmd/openreview
+```
+
 Use an OpenAI-compatible API:
 
 ```powershell
