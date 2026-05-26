@@ -72,6 +72,8 @@ func NewServer(opts ServerOptions) *Server {
 
 func (s *Server) Routes() http.Handler {
 	mux := http.NewServeMux()
+	mux.HandleFunc("GET /", s.root)
+	mux.HandleFunc("POST /", s.githubWebhookRoot)
 	mux.HandleFunc("GET /healthz", s.health)
 	mux.HandleFunc("POST /webhooks/github", s.githubWebhook)
 	mux.HandleFunc("GET /reviews/{id}", s.getReview)
@@ -79,6 +81,24 @@ func (s *Server) Routes() http.Handler {
 	mux.HandleFunc("POST /review-profiles", s.createReviewProfile)
 	mux.HandleFunc("PUT /review-profiles/{id}", s.updateReviewProfile)
 	return mux
+}
+
+func (s *Server) root(w http.ResponseWriter, r *http.Request) {
+	writeJSON(w, http.StatusOK, map[string]string{
+		"service":        "OpenReview AI",
+		"health":         "/healthz",
+		"github_webhook": "/webhooks/github",
+	})
+}
+
+func (s *Server) githubWebhookRoot(w http.ResponseWriter, r *http.Request) {
+	if r.Header.Get("X-GitHub-Event") == "" {
+		writeError(w, http.StatusNotFound, "not_found")
+		return
+	}
+
+	s.logger.Warn("GitHub webhook received at root path; configure webhook URL to /webhooks/github")
+	s.githubWebhook(w, r)
 }
 
 func (s *Server) health(w http.ResponseWriter, r *http.Request) {
