@@ -67,6 +67,25 @@ $env:GITHUB_WEBHOOK_SECRET="dev-secret"
 go run ./cmd/openreview
 ```
 
+Use OpenRouter:
+
+```powershell
+$env:OPENREVIEW_PROVIDER="openrouter"
+$env:OPENROUTER_API_KEY="..."
+$env:OPENREVIEW_MODEL="anthropic/claude-sonnet-4"
+go run ./cmd/openreview
+```
+
+Use an OpenAI-compatible API:
+
+```powershell
+$env:OPENREVIEW_PROVIDER="openai-compatible"
+$env:OPENREVIEW_PROVIDER_BASE_URL="http://localhost:1234/v1"
+$env:OPENREVIEW_PROVIDER_API_KEY="..."
+$env:OPENREVIEW_MODEL="local-model"
+go run ./cmd/openreview
+```
+
 Run with Docker:
 
 ```powershell
