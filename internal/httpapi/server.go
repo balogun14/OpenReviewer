@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/openreview-ai/openreview/internal/finding"
 	"github.com/openreview-ai/openreview/internal/github"
@@ -138,14 +139,25 @@ func (s *Server) githubWebhook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	input, token, metadata, files, err := s.reviewInputFromEvent(r.Context(), event)
+	reviewCtx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
+	defer cancel()
+
+	s.logger.Info("GitHub pull request webhook accepted",
+		"owner", event.Repository.Owner.Login,
+		"repo", event.Repository.Name,
+		"pullRequest", event.Number,
+		"action", event.Action,
+		"installation", event.Installation.ID,
+	)
+
+	input, token, metadata, files, err := s.reviewInputFromEvent(reviewCtx, event)
 	if err != nil {
 		s.logger.Error("prepare review failed", "error", err)
 		writeError(w, http.StatusInternalServerError, "prepare_review_failed")
 		return
 	}
 
-	result, err := s.reviewEngine.ReviewPullRequest(r.Context(), input)
+	result, err := s.reviewEngine.ReviewPullRequest(reviewCtx, input)
 	if err != nil {
 		s.logger.Error("review failed", "error", err)
 		writeError(w, http.StatusInternalServerError, "review_failed")
@@ -153,7 +165,7 @@ func (s *Server) githubWebhook(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if s.gitHubClient != nil && token != "" {
-		if err := s.publishReview(r.Context(), token, event, metadata.HeadSHA, files, result); err != nil {
+		if err := s.publishReview(reviewCtx, token, event, metadata.HeadSHA, files, result); err != nil {
 			s.logger.Error("publish review failed", "error", err)
 		}
 	}
