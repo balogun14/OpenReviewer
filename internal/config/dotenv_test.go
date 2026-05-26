@@ -14,7 +14,11 @@ func TestLoadDotEnvDoesNotOverrideExistingEnv(t *testing.T) {
 	}
 
 	t.Setenv("EXISTING", "from-env")
-	loadDotEnv(path)
+	status := loadDotEnv(path)
+
+	if !status.Loaded {
+		t.Fatal("expected dotenv to be loaded")
+	}
 
 	if got := os.Getenv("OPENREVIEW_ADDR"); got != ":9999" {
 		t.Fatalf("expected env file value, got %q", got)
