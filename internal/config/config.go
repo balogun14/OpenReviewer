@@ -1,12 +1,22 @@
 package config
 
-import "os"
+import (
+	"os"
+	"strings"
+)
 
 type Config struct {
 	Addr                string
 	GitHubWebhookSecret string
+	GitHub              GitHubConfig
 	Provider            ProviderConfig
 	Retry               RetryConfig
+}
+
+type GitHubConfig struct {
+	AppID         string
+	PrivateKeyPEM []byte
+	APIBaseURL    string
 }
 
 type ProviderConfig struct {
@@ -37,6 +47,11 @@ func FromEnv() Config {
 	return Config{
 		Addr:                addr,
 		GitHubWebhookSecret: os.Getenv("GITHUB_WEBHOOK_SECRET"),
+		GitHub: GitHubConfig{
+			AppID:         os.Getenv("GITHUB_APP_ID"),
+			PrivateKeyPEM: githubPrivateKey(),
+			APIBaseURL:    getenvDefault("GITHUB_API_BASE_URL", "https://api.github.com"),
+		},
 		Provider: ProviderConfig{
 			Type:     providerType,
 			BaseURL:  os.Getenv("OPENREVIEW_PROVIDER_BASE_URL"),
@@ -49,6 +64,23 @@ func FromEnv() Config {
 			MaxAttempts: getenvIntDefault("OPENREVIEW_PROVIDER_MAX_ATTEMPTS", 2),
 		},
 	}
+}
+
+func githubPrivateKey() []byte {
+	if value := os.Getenv("GITHUB_APP_PRIVATE_KEY"); value != "" {
+		return []byte(strings.ReplaceAll(value, `\n`, "\n"))
+	}
+
+	path := os.Getenv("GITHUB_APP_PRIVATE_KEY_PATH")
+	if path == "" {
+		return nil
+	}
+
+	content, err := os.ReadFile(path)
+	if err != nil {
+		return nil
+	}
+	return content
 }
 
 func providerAPIKey(providerType string) string {
