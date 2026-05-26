@@ -47,26 +47,26 @@ Exit criteria:
 
 Goal: review actual pull requests and publish useful GitHub feedback.
 
-- [ ] Add GitHub App configuration
-- [ ] Implement installation token generation
-- [ ] Fetch pull request metadata
-- [ ] Fetch changed files and patches
-- [ ] Detect supported file types
-- [ ] Ignore generated files and lockfiles
-- [ ] Chunk large diffs
-- [ ] Map findings to changed lines
-- [ ] Post inline PR comments
-- [ ] Post review summary comment
-- [ ] Create or update check runs
-- [ ] Add idempotency for repeated webhook delivery
-- [ ] Add tests for GitHub payload handling
-- [ ] Add tests for changed-line mapping
+- [x] Add GitHub App configuration
+- [x] Implement installation token generation
+- [x] Fetch pull request metadata
+- [x] Fetch changed files and patches
+- [x] Detect supported file types
+- [x] Ignore generated files and lockfiles
+- [x] Chunk large diffs
+- [x] Map findings to changed lines
+- [x] Post inline PR comments
+- [x] Post review summary comment
+- [x] Create or update check runs
+- [x] Add idempotency for repeated webhook delivery
+- [x] Add tests for GitHub payload handling
+- [x] Add tests for changed-line mapping
 
 Exit criteria:
 
-- [ ] Opening or updating a PR triggers a review
-- [ ] Findings appear as GitHub comments
-- [ ] A summary comment includes severity counts and recommendation
+- [x] Opening or updating a PR triggers a review
+- [x] Findings appear as GitHub comments
+- [x] A summary comment includes severity counts and recommendation
 
 ## Phase 3: Repository Configuration
 
