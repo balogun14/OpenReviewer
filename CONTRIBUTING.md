@@ -19,6 +19,12 @@ go test ./...
 go build ./cmd/openreview
 ```
 
+Or, if `make` is available:
+
+```powershell
+make check
+```
+
 Run the service:
 
 ```powershell
@@ -75,6 +81,24 @@ Use clear, imperative commit messages:
 Add prompt renderer include validation
 Fix GitHub webhook signature parsing
 Document review profile format
+```
+
+For changes that should be committed one file at a time:
+
+```powershell
+.\scripts\commit-each-file.ps1
+```
+
+Preview the commits without writing them:
+
+```powershell
+.\scripts\commit-each-file.ps1 -WhatIf
+```
+
+Or, if `make` is available:
+
+```powershell
+make commit-each-file
 ```
 
 ## Pull Request Checklist
