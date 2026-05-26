@@ -33,6 +33,8 @@ type RetryConfig struct {
 }
 
 func FromEnv() Config {
+	loadDotEnv(".env")
+
 	addr := os.Getenv("OPENREVIEW_ADDR")
 	if addr == "" {
 		addr = ":8080"
@@ -67,20 +69,29 @@ func FromEnv() Config {
 }
 
 func githubPrivateKey() []byte {
-	if value := os.Getenv("GITHUB_APP_PRIVATE_KEY"); value != "" {
-		return []byte(strings.ReplaceAll(value, `\n`, "\n"))
-	}
-
 	path := os.Getenv("GITHUB_APP_PRIVATE_KEY_PATH")
-	if path == "" {
+	if path != "" {
+		content, err := os.ReadFile(path)
+		if err == nil {
+			return content
+		}
+	}
+
+	value := os.Getenv("GITHUB_APP_PRIVATE_KEY")
+	if value == "" {
 		return nil
 	}
 
-	content, err := os.ReadFile(path)
-	if err != nil {
-		return nil
+	normalized := strings.ReplaceAll(value, `\n`, "\n")
+	if strings.Contains(normalized, "BEGIN") {
+		return []byte(normalized)
 	}
-	return content
+
+	if content, err := os.ReadFile(normalized); err == nil {
+		return content
+	}
+
+	return []byte(normalized)
 }
 
 func providerAPIKey(providerType string) string {
