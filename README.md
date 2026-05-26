@@ -1,4 +1,8 @@
-# OpenReview AI
+<p align="center">
+  <img src="logo.png" alt="OpenReview AI logo" width="220">
+</p>
+
+<h1 align="center">OpenReview AI</h1>
 
 OpenReview AI is an open-source, self-hostable GitHub App for automated pull request reviews using configurable LLM providers and repository-specific review standards.
 
