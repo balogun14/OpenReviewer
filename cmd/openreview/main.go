@@ -22,6 +22,11 @@ func main() {
 	reviewProvider := buildProvider(cfg, logger)
 	engine := review.NewEngine(reviewProvider, promptRenderer, review.DefaultReviewerPersonas())
 	gitHubClient := buildGitHubClient(cfg)
+	if gitHubClient == nil {
+		logger.Warn("GitHub App integration disabled; set GITHUB_APP_ID and GITHUB_APP_PRIVATE_KEY_PATH")
+	} else {
+		logger.Info("GitHub App integration enabled", "apiBaseUrl", cfg.GitHub.APIBaseURL)
+	}
 	server := httpapi.NewServer(httpapi.ServerOptions{
 		Logger:              logger,
 		ReviewEngine:        engine,
